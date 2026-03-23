@@ -27,8 +27,25 @@ export function LobbyScreen({ room, playerId, isHost }: LobbyScreenProps) {
     setStarting(false);
   }
 
-  function copyCode() {
-    navigator.clipboard.writeText(room.code);
+  function getJoinUrl() {
+    return `${window.location.origin}/room/${room.code}`;
+  }
+
+  async function shareRoom() {
+    const url = getJoinUrl();
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: "Most Likely To",
+          text: `Join my game! Code: ${room.code}`,
+          url,
+        });
+        return;
+      } catch {
+        // User cancelled or share failed — fall through to clipboard
+      }
+    }
+    await navigator.clipboard.writeText(url);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   }
@@ -43,16 +60,21 @@ export function LobbyScreen({ room, playerId, isHost }: LobbyScreenProps) {
               Room Code — share with friends
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <button
-              onClick={copyCode}
-              className="w-full rounded-xl bg-zinc-900 py-4 text-center"
-            >
+          <CardContent className="space-y-3">
+            <div className="w-full rounded-xl bg-zinc-900 py-4 text-center">
               <span className="font-mono text-4xl font-black tracking-widest text-white">
                 {room.code}
               </span>
-              <p className="mt-1 text-xs text-zinc-400">
-                {copied ? "Copied! ✓" : "Tap to copy"}
+            </div>
+            <button
+              onClick={shareRoom}
+              className="w-full rounded-xl border-2 border-dashed border-violet-300 bg-violet-50 py-3 text-center transition-colors active:bg-violet-100"
+            >
+              <p className="text-sm font-semibold text-violet-700">
+                {copied ? "Link copied! ✓" : "📤 Share join link"}
+              </p>
+              <p className="mt-0.5 text-xs text-violet-400">
+                Friends can join directly — no code needed
               </p>
             </button>
           </CardContent>

@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -18,6 +18,7 @@ function getOrCreatePlayerId(): string {
 
 export function HomeScreen() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [name, setName] = useState(() =>
     typeof window !== "undefined" ? localStorage.getItem("playerName") ?? "" : ""
   );
@@ -25,6 +26,14 @@ export function HomeScreen() {
   const [mode, setMode] = useState<"idle" | "join">("idle");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    const code = searchParams.get("join");
+    if (code) {
+      setJoinCode(code.toUpperCase());
+      setMode("join");
+    }
+  }, [searchParams]);
 
   function saveName(n: string) {
     setName(n);

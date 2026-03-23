@@ -26,8 +26,8 @@ export default function RoomPage() {
     if (stored) {
       setPlayerId(stored.playerId);
     } else {
-      // Redirect home if no player identity
-      window.location.href = "/";
+      // Redirect home with code pre-filled so they can join directly
+      window.location.href = `/?join=${code}`;
     }
   }, []);
 
